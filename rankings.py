@@ -5,19 +5,15 @@ import urllib
 import csv
 from bs4 import BeautifulSoup
 
-# html = requests.get("http://play.usaultimate.org/teams/events/team_rankings/?RankSet=College-Men")
-# soup = BeautifulSoup(html.text, "html.parser")
-
-payload = {'CT_Main_0$lnkViewAll': ''}
-
 # file stuff
 output = open('games.csv', 'wb')
 writer = csv.writer(output, dialect='excel')
 writer.writerow( ('Team', 'opponent', 'score', 'date', 'tournament') )
 
 # make a request to the server
-r1 = requests.post("http://play.usaultimate.org/teams/events/team_rankings/?RankSet=College-Men", data=payload)
-soup1 = BeautifulSoup(r1.text, "html.parser")
+payload = {'CT_Main_0$lnkViewAll': ''}
+html = requests.post("http://play.usaultimate.org/teams/events/team_rankings/?RankSet=College-Men", data=payload)
+soup1 = BeautifulSoup(html.text, "html.parser")
 
 # get all the links in the HTML
 for HTMLLink in soup1.find_all('a'):
@@ -44,21 +40,25 @@ for HTMLLink in soup1.find_all('a'):
             match = re.search(".* \d\d( |$)", dates[index].text)
             if match:
 
-                writer.writerow( (team, \
-                                  teams[index - indexDifference].text, \
-                                  scores[index - indexDifference].text, \
-                                  dates[index].text, \
-                                  tournament \
-                               ) )
+                try:
+                    writer.writerow( (team, \
+                                      teams[index - indexDifference].text, \
+                                      scores[index - indexDifference].text, \
+                                      dates[index].text, \
+                                      tournament \
+                                   ) )
 
-                print("[%(team)s, %(opponent)s, %(score)s, " + \
-                      " %(date)s, %(tournament)s]" % \
-                     {"team": team, \
-                      "opponent":teams[index - indexDifference].text, \
-                      "score": scores[index - indexDifference].text, \
-                      "date": dates[index].text, \
-                      "tournament": tournament
-                     })
+                    print("[%(team)s, %(opponent)s, %(score)s, \
+                            %(date)s, %(tournament)s]" % \
+                         {"team": team, \
+                          "opponent":teams[index - indexDifference].text, \
+                          "score": scores[index - indexDifference].text, \
+                          "date": dates[index].text, \
+                          "tournament": tournament
+                         })
+                except:
+                    print("index: %(i)i" % {"i" : index})
+                    print("indexDifference: %(i)i" %  {"i" : indexDifference})
 
             else:
                 indexDifference = indexDifference + 1
