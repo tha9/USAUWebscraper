@@ -1,0 +1,4 @@
+Used selenium package to click on viewall. 
+Need to pip install selenium if you don't have it. 
+also need to download chromedrive and add the directory of chromedrive to the etc/paths file
+Restart
